@@ -20,6 +20,13 @@ const backend = defineBackend({
   sampleApi,
 });
 
+const cfnUserPool = backend.auth.resources.cfnResources.cfnUserPool;
+cfnUserPool.addPropertyOverride('Policies.PasswordPolicy.MinimumLength', 8);
+cfnUserPool.addPropertyOverride('Policies.PasswordPolicy.RequireLowercase', true);
+cfnUserPool.addPropertyOverride('Policies.PasswordPolicy.RequireUppercase', true);
+cfnUserPool.addPropertyOverride('Policies.PasswordPolicy.RequireNumbers', true);
+cfnUserPool.addPropertyOverride('Policies.PasswordPolicy.RequireSymbols', true);
+
 const isProduction = process.env.AWS_BRANCH === 'production';
 
 const sampleLambda = backend.sampleApi.resources.lambda;
