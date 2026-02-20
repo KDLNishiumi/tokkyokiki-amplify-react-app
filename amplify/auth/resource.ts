@@ -1,11 +1,31 @@
 import { defineAuth } from '@aws-amplify/backend';
 
-/**
- * Define and configure your auth resource
- * @see https://docs.amplify.aws/gen2/build-a-backend/auth
- */
+const getCallbackUrls = () => {
+  const urls = ['http://localhost:5173/'];
+  const appId = process.env.AWS_APP_ID;
+  const branch = process.env.AWS_BRANCH || 'main';
+
+  if (appId) {
+    urls.push(`https://${branch}.${appId}.amplifyapp.com/`);
+  }
+
+  return urls;
+};
+
 export const auth = defineAuth({
   loginWith: {
-    email: true,
+    email: {
+      verificationEmailSubject: 'Verify your email',
+      verificationEmailBody: (code: () => string) => `Your verification code is ${code()}`,
+    },
+    externalProviders: {
+      callbackUrls: getCallbackUrls(),
+      logoutUrls: getCallbackUrls(),
+    },
   },
+  multifactor: {
+    mode: 'OPTIONAL',
+    totp: true,
+  },
+  accountRecovery: 'EMAIL_ONLY',
 });
